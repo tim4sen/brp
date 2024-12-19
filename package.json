@@ -1,0 +1,17 @@
+{
+  "name": "boroughrp",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "engines": {
+    "node": "16.x",
+    "npm": "6.x"
+  },
+  "dependencies": {
+    "discord.js": "^13.6.0",
+    "dotenv": "^16.0.0",
+    "express": "^4.17.1"
+  },
+  "author": "tim.lt"
+}
