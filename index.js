@@ -4,9 +4,7 @@ const fs = require('fs');
 require('dotenv').config();
 
 const app = express();
-const port = process.env.PORT || 3000;
 
-// Initialize Discord bot client
 const client = new Client({
   intents: [
     Intents.FLAGS.GUILDS,
@@ -16,15 +14,15 @@ const client = new Client({
   ]
 });
 
-// Log to console when the bot is online
+const eventFiles = fs.readdirSync('./events').filter(file => file.endsWith('.js'));
+for (const file of eventFiles) {
+    const event = require(`./events/${file}`);
+    const eventName = file.split('.')[0];
+    client.on(eventName, (...args) => event.execute(...args, client));
+}
+
 client.on('ready', () => {
   console.log(`${client.user.tag} is now online!`);
 });
 
-// Start the Express server to handle web requests
-app.listen(port, () => {
-  console.log(`Server is running on port ${port}`);
-});
-
-// Log in to Discord
 client.login(process.env.BOT_TOKEN);
