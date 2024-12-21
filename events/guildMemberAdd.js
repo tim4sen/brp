@@ -1,4 +1,5 @@
 module.exports = {
+  name: 'guildMemberAdd',  // Add the event name
   execute(member, client) {
     console.log("Event fired for member:", member.user.tag);
 
