@@ -4,6 +4,8 @@ const fs = require("fs");
 const path = require("path");
 require("dotenv").config();
 
+const port = process.env.PORT || 3000;
+
 const client = new Client({
   intents: [
     IntentsBitField.Flags.Guilds,
@@ -72,6 +74,10 @@ client.on("interactionCreate", async (interaction) => {
 
 client.on("ready", () => {
   console.log(`${client.user.tag} is now online!`);
+});
+
+app.listen(port, () => {
+    console.log(`Server is running on port ${port}`);
 });
 
 client.login(process.env.BOT_TOKEN);
