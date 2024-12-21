@@ -2,6 +2,8 @@ const { Client, IntentsBitField, REST } = require("discord.js");
 const { Routes } = require("discord-api-types/v10");
 const fs = require("fs");
 const path = require("path");
+const express = require('express');
+const app = express();
 require("dotenv").config();
 
 const port = process.env.PORT || 3000;
@@ -70,6 +72,10 @@ client.on("interactionCreate", async (interaction) => {
       });
     }
   }
+});
+
+app.get('/', (req, res) => {
+    res.send('Hello World!');
 });
 
 client.on("ready", () => {
