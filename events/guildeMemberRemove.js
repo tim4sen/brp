@@ -1,6 +1,8 @@
 module.exports = {
+  name: 'guildMemberRemove',  // Add the event name
   execute(member, client) {
     console.log('Event fired for member:', member.user.tag);
+
     const leaveLogChannelId = '1319426298380025906';
     const channel = client.channels.cache.get(leaveLogChannelId);
 
