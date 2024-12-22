@@ -76,7 +76,7 @@ module.exports = {
         embeds: [
           {
             title: "Ticket Created",
-            description: `A new support ticket has been created by <@${interaction.user.id}> for the reason: ${reason}. A support staff member will assist you shortly.`,
+            description: `A new support ticket has been created by **<@${interaction.user.id}>** for the reason: \`${reason}\`. A support staff member will assist you shortly.`,
             color: 0x9e1de1, // Purple color
           },
         ],
