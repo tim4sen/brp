@@ -22,7 +22,7 @@ module.exports = {
 
     // Ensure the category exists
     if (!ticketCategory) {
-      return interaction.reply('Ticket category "TICKETS" not found! Please create it first.');
+      return interaction.reply('Error: Ticket Category not found');
     }
 
     try {
