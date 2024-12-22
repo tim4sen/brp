@@ -20,7 +20,7 @@ module.exports = {
 
     // Role IDs for permission overwrites
     const roleToCheck = "1319439176218710181"; // User role ID
-    const roleWithPermission = "1319439175640023060"; // Special role ID
+    const roleWithPermission = "1319439175640023060"; // Special role ID (Support role)
 
     // Check if the user already has a ticket open (private channel)
     const existingChannel = interaction.guild.channels.cache.find(
@@ -59,19 +59,40 @@ module.exports = {
           },
           {
             id: roleWithPermission,
-            allow: [PermissionsBitField.Flags.ViewChannel, PermissionsBitField.Flags.SendMessages], // Allow special role to view and send messages
+            allow: [PermissionsBitField.Flags.ViewChannel, PermissionsBitField.Flags.SendMessages], // Allow support role to view and send messages
           },
         ],
       });
 
-      // Send a confirmation message to the user
+      // Create a webhook in the new channel
+      const webhook = await newChannel.createWebhook({
+        name: "Ticket Creation",
+        avatar: "https://media.discordapp.net/attachments/1319437039917207635/1319458467953512519/Copy_of_Untitled_Design_1.png?ex=67680335&is=6766b1b5&hm=c8a132ef8bb3b73e7eea3b55f7f78e125ce2e171265356986b434cc6aefc15da&=&format=webp&quality=lossless", // Optional: Set an avatar for the webhook
+      });
+
+      // Send a message using the webhook with pings
+      const content = {
+        content: `<@${interaction.user.id}> <@&${roleWithPermission}>`, // Ping the user and the support role
+        embeds: [
+          {
+            title: "Ticket Created",
+            description: `A new support ticket has been created by <@${interaction.user.id}> for the reason: ${reason}. A support staff member will assist you shortly.`,
+            color: 0x9e1de1, // Purple color
+          },
+        ],
+      };
+
+      // Send the webhook message
+      await webhook.send(content);
+
+      // Confirm the creation to the user
       await interaction.followUp({
         content: `Your support ticket has been created: ${newChannel}.`,
         ephemeral: true,
       });
 
     } catch (error) {
-      console.error("Error creating the channel:", error);
+      console.error("Error creating the channel or webhook:", error);
       await interaction.followUp({
         content:
           "There was an error creating the ticket. Please try again later.",
