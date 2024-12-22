@@ -7,7 +7,7 @@ module.exports = {
     options: [
       {
         name: "reason",
-        type: "STRING",
+        type: "1",
         description: "Reason for the ticket",
         required: true,
       },
