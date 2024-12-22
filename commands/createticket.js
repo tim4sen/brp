@@ -1,70 +1,82 @@
-const { SlashCommandBuilder } = require('@discordjs/builders');
-const { MessageEmbed } = require('discord.js');
+const { PermissionsBitField, ChannelType } = require("discord.js");
 
-// Create slash command for /createticket
 module.exports = {
-  data: new SlashCommandBuilder()
-    .setName('createticket')
-    .setDescription('Create a support ticket')
-    .addStringOption(option =>
-      option.setName('reason')
-        .setDescription('Reason for the ticket')
-        .setRequired(true)),
+  data: {
+    name: "createticket",
+    description: "Create a private support ticket",
+    options: [
+      {
+        name: "reason",
+        type: "STRING",
+        description: "Reason for the ticket",
+        required: true,
+      },
+    ],
+  },
 
   async execute(interaction) {
-    const reason = interaction.options.getString('reason');
-    const user = interaction.user;
-    const roleId = '1319439174528667668'; // Your role ID
+    const reason = interaction.options.getString("reason");
+    const member = interaction.guild.members.cache.get(interaction.user.id);
+
+    // Role IDs for permission overwrites
+    const roleToCheck = "1319439176218710181"; // User role ID
+    const roleWithPermission = "1319439175640023060"; // Special role ID
+
+    // Check if the user already has a ticket open (private channel)
+    const existingChannel = interaction.guild.channels.cache.find(
+      (channel) =>
+        channel.name === `ticket-${interaction.user.username}` &&
+        channel.type === ChannelType.GuildText
+    );
+
+    if (existingChannel) {
+      return interaction.reply({
+        content: "You already have an open ticket.",
+        ephemeral: true,
+      });
+    }
 
     try {
-      // Ensure the channel name is set correctly (ticket-${user.username})
-      const ticketChannelName = `ticket-${user.username}`;
+      // Respond to the user immediately to avoid the "application did not respond" error
+      await interaction.reply({
+        content: "Creating your support ticket...",
+        ephemeral: true,
+      });
 
-      // Create the ticket channel
-      const ticketChannel = await interaction.guild.channels.create(ticketChannelName, {
-        type: 'GUILD_TEXT',
+      // Create a new private channel with proper permission overwrites
+      const newChannel = await interaction.guild.channels.create({
+        name: `ticket-${interaction.user.username}`, // Properly set the name
+        type: ChannelType.GuildText, // Text channel
+        topic: reason, // Set the reason as the topic
         permissionOverwrites: [
           {
-            id: user.id,
-            allow: ['VIEW_CHANNEL', 'SEND_MESSAGES'],
+            id: interaction.guild.id,
+            deny: [PermissionsBitField.Flags.ViewChannel], // Deny view for everyone
           },
           {
-            id: roleId, // Your role ID
-            allow: ['VIEW_CHANNEL', 'SEND_MESSAGES'],
+            id: interaction.user.id,
+            allow: [PermissionsBitField.Flags.ViewChannel, PermissionsBitField.Flags.SendMessages], // Allow the user to view and send messages
           },
           {
-            id: interaction.guild.id, // Deny access to everyone else
-            deny: ['VIEW_CHANNEL'],
+            id: roleWithPermission,
+            allow: [PermissionsBitField.Flags.ViewChannel, PermissionsBitField.Flags.SendMessages], // Allow special role to view and send messages
           },
         ],
       });
 
-      // Create the embed with a description and reason
-      const embed = new MessageEmbed()
-        .setColor('#9e1de1')
-        .setTitle('Ticket Created')
-        .setDescription(`**Reason:** ${reason}`)
-        .setFooter(`Ticket created by ${user.username}`, user.displayAvatarURL());
-
-      // Send the embed to the new ticket channel
-      await ticketChannel.send({
-        content: `<@${user.id}>`, // Ping the user who created the ticket
-        embeds: [embed],
+      // Send a confirmation message to the user
+      await interaction.followUp({
+        content: `Your support ticket has been created: ${newChannel}.`,
+        ephemeral: true,
       });
 
-      // Reply to the user who created the ticket
-      if (!interaction.replied) {
-        await interaction.reply(`Your ticket has been created! Check out ${ticketChannel} for further assistance.`);
-      } else {
-        await interaction.followUp(`Your ticket has been created! Check out ${ticketChannel} for further assistance.`);
-      }
     } catch (error) {
-      console.error(error);
-      if (!interaction.replied) {
-        await interaction.reply('There was an error while creating the ticket.');
-      } else {
-        await interaction.followUp('There was an error while creating the ticket.');
-      }
+      console.error("Error creating the channel:", error);
+      await interaction.followUp({
+        content:
+          "There was an error creating the ticket. Please try again later.",
+        ephemeral: true,
+      });
     }
   },
 };
