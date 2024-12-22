@@ -61,10 +61,18 @@ module.exports = {
       });
 
       // Reply to the user who created the ticket
-      await interaction.reply(`Your ticket has been created! Check out ${ticketChannel} for further assistance.`);
+      if (!interaction.replied) {
+        await interaction.reply(`Your ticket has been created! Check out ${ticketChannel} for further assistance.`);
+      } else {
+        await interaction.followUp(`Your ticket has been created! Check out ${ticketChannel} for further assistance.`);
+      }
     } catch (error) {
       console.error(error);
-      return interaction.reply('There was an error while creating the ticket.');
+      if (!interaction.replied) {
+        await interaction.reply('There was an error while creating the ticket.');
+      } else {
+        await interaction.followUp('There was an error while creating the ticket.');
+      }
     }
   },
 };
