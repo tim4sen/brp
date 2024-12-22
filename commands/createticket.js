@@ -15,10 +15,11 @@ module.exports = {
     const reason = interaction.options.getString('reason');
     const user = interaction.user;
     const roleId = '1319439174528667668'; // Your role ID
+    const ticketCategoryId = '1320181489530441788'; // Your category ID
 
     // Create the ticket channel
     const guild = interaction.guild;
-    const ticketCategory = guild.channels.cache.find(c => c.name === "tickets" && c.type === "GUILD_CATEGORY");
+    const ticketCategory = guild.channels.cache.get(ticketCategoryId);
 
     // Ensure the category exists
     if (!ticketCategory) {
