@@ -18,7 +18,7 @@ module.exports = {
 
     // Create the ticket channel
     const guild = interaction.guild;
-    const ticketCategory = guild.channels.cache.find(c => c.name === "TICKETS" && c.type === "GUILD_CATEGORY");
+    const ticketCategory = guild.channels.cache.find(c => c.name === "tickets" && c.type === "GUILD_CATEGORY");
 
     // Ensure the category exists
     if (!ticketCategory) {
