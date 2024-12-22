@@ -15,22 +15,14 @@ module.exports = {
     const reason = interaction.options.getString('reason');
     const user = interaction.user;
     const roleId = '1319439174528667668'; // Your role ID
-    const ticketCategoryId = '1320181489530441788'; // Your category ID
-
-    // Create the ticket channel
-    const guild = interaction.guild;
-    const ticketCategory = guild.channels.cache.get(ticketCategoryId);
-
-    // Ensure the category exists
-    if (!ticketCategory) {
-      return interaction.reply('Error: Ticket Category not found');
-    }
 
     try {
-      // Create the ticket channel with the user’s name
-      const ticketChannel = await guild.channels.create(`ticket-${user.username}`, {
+      // Ensure the channel name is set correctly (ticket-${user.username})
+      const ticketChannelName = `ticket-${user.username}`;
+
+      // Create the ticket channel
+      const ticketChannel = await interaction.guild.channels.create(ticketChannelName, {
         type: 'GUILD_TEXT',
-        parent: ticketCategory.id,
         permissionOverwrites: [
           {
             id: user.id,
@@ -41,22 +33,22 @@ module.exports = {
             allow: ['VIEW_CHANNEL', 'SEND_MESSAGES'],
           },
           {
-            id: guild.id,
+            id: interaction.guild.id, // Deny access to everyone else
             deny: ['VIEW_CHANNEL'],
           },
         ],
       });
 
-      // Create the embed with a ping to the role and user
+      // Create the embed with a description and reason
       const embed = new MessageEmbed()
         .setColor('#9e1de1')
         .setTitle('Ticket Created')
         .setDescription(`**Reason:** ${reason}`)
         .setFooter(`Ticket created by ${user.username}`, user.displayAvatarURL());
 
-      // Send the embed and ping the role and user
+      // Send the embed to the new ticket channel
       await ticketChannel.send({
-        content: `<@&${roleId}> <@${user.id}>`, // Pings the role and the user
+        content: `<@${user.id}>`, // Ping the user who created the ticket
         embeds: [embed],
       });
 
